@@ -14,3 +14,12 @@ DELETE http://localhost:3000/book/3
 
 ###
 GET http://localhost:3000/book/0
+
+###
+POST http://localhost:3000/notes
+Content-Type: application/json
+
+{
+  "title": "Le petit garcon",
+  "content": "super"
+}
