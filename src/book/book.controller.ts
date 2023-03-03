@@ -1,56 +1,40 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
-  Put,
+  Body,
+  Query,
+  Delete,
 } from '@nestjs/common';
+import { BookService } from './book.service';
+import { CreateBookDTO } from './dto/create-book.dto';
 
 @Controller('book')
 export class BookController {
-  protected readonly books: string[] = [
-    'American Psycho',
-    "J'irai cracher sur vos tombes",
-    'Sa majesté des mouches',
-  ];
+  constructor(private bookService: BookService) {}
+
   @Get()
-  list(): string[] {
-    return this.books;
+  async getBooks() {
+    const books = await this.bookService.getBooks();
+    return books;
   }
-  @Get('/:index')
-  getBookByIndex(@Param('index') index: string) {
-    if (!this.books[index]) {
-      throw new NotFoundException(`Book with index ${index} does not exist!`);
-    }
-    return this.books[index];
+
+  @Get(':bookID')
+  async getBook(@Param('bookID') bookID) {
+    const book = await this.bookService.getBook(bookID);
+    return book;
   }
 
   @Post()
-  addBook(@Body('title') book: string) {
-    this.books.push(book);
+  async addBook(@Body() createBookDTO: CreateBookDTO) {
+    const book = await this.bookService.addBook(createBookDTO);
     return book;
   }
 
-  @Put('/:index')
-  updateBook(@Param('index') index: string, @Body('title') book: string) {
-    if (!this.books[index]) {
-      throw new NotFoundException(`Book with index ${index} does not exist!`);
-    }
-    this.books[index] = book;
-    return book;
-  }
-
-  @Delete('/:index')
-  deleteBook(@Param('index') index: string) {
-    if (!this.books[index]) {
-      throw new NotFoundException(`Book with index ${index} does not exist!`);
-    }
-
-    this.books.splice(parseInt(index, 10), 1);
-
-    return 'deleted';
+  @Delete()
+  async deleteBook(@Query() query) {
+    const books = await this.bookService.deleteBook(query.bookID);
+    return books;
   }
 }
